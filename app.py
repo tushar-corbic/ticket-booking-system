@@ -4,7 +4,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, log
 from wtforms.validators import ValidationError
 from flask_bcrypt import Bcrypt
 
-from models import Venue, Show, User, Admin, AdminLoginForm, LoginForm, RegisterForm
+from models import Venue, Show, User, Admin, AdminLoginForm, LoginForm, RegisterForm, AddVenueForm, AddShowForm, UpdateShowForm, UpdateVenueForm, DeleteShowForm, DeleteVenueForm
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -183,9 +183,53 @@ def register():
 
     return render_template('register.html', form=form)
 
-@app.route("/addVenue", methods=["GET", "POST"])
+@app.route("/admin/addVenue", methods=["GET", "POST"])
+def addVenue():
+    if not session.get('admin_id'):
+        return redirect('/admin/')
+    form = AddVenueForm()
+    if form.validate_on_submit():
+        new_venue = Venue(name=form.name.data,place = form.place.data, capacity = form.capacity.data)
+        db.session.add(new_venue)
+        db.session.commit()
+        flash("added the venue successfully", "success")
+        return redirect("/admin/")
+    print("could not add the venue")
+    raise ValidationError("Could not add Venue!!!!")
+
+@app.route("/admin/updateVenue", methods=["GET", "POST"])
 def updateVenue():
-    pass
+    if not session.get("admin_id"):
+        return redirect("/admin/")
+    form = UpdateVenueForm()
+    if form.validate_on_submit():
+        old_venue = Venue().query.filter_by(name=form.name.data).first()
+        if old_venue=="":
+            print("did not find the venue")
+            flash("Did not found the venue for update")
+        else:
+            Venue().query.filter_by(name=form.name.data).update(dict(place=form.place.data, capacity= form.capacity.data))
+            db.session.commit()
+            flash("updated the Venue successfully", "success")
+            print("udpated the venue successfully")
+            return redirect("/admin/")
+
+
+@app.route("admin/deleteVenue", methods=["GET" , "POST"])
+def deleteVenue():
+    if not session.get("admin_id"):
+        return redirect("/admin/")
+    form = DeleteVenueForm()
+    if form.validate_on_submit():
+        old_venue = Venue().query.filter_by(name=form.name.data).first()
+        if old_venue=="":
+            print("did not find the venue")
+            flash("Did not found the venue for update", "danger")
+        else:
+            Venue.query.filter_by(name=form.name.data).delete()
+            print("deleted the venue successfully")
+            flash("Deleted the venue successfully", "success")
+        return redirect("/admin/")
 
 
 if __name__ == "__main__":
