@@ -230,9 +230,14 @@ def deleteVenue():
             Venue.query.filter_by(name=form.name.data).delete()
             print("deleted the venue successfully")
             flash("Deleted the venue successfully", "success")
-        return redirect("/admin/")
+            return redirect("/admin/")
 
 ####################### api for venue end ########################################################3
+
+
+
+
+######################## api for show ############################################################
 @app.route("/admin/addShow", methods=["GET", "POST"])
 def addShow():
     if not session.get('admin_id'):
@@ -252,37 +257,36 @@ def addShow():
 def updateVenue():
     if not session.get("admin_id"):
         return redirect("/admin/")
-    form = UpdateVenueForm()
+    form = UpdateShowForm()
     if form.validate_on_submit():
-        old_venue = Venue().query.filter_by(name=form.name.data).first()
-        if old_venue=="":
-            print("did not find the venue")
-            flash("Did not found the venue for update")
+        old_show = Show().query.filter_by(name=form.name.data).first()
+        if old_show=="":
+            print("did not find the Show")
+            flash("Did not found the Show for update", "danger")
         else:
-            Venue().query.filter_by(name=form.name.data).update(dict(place=form.place.data, capacity= form.capacity.data))
+            Show().query.filter_by(name=form.name.data).update(dict(ratings=form.ratings.data, tags= form.tags.data, ticketPrice=form.ticketPrice.data,venue=form.venue.data))
             db.session.commit()
-            flash("updated the Venue successfully", "success")
-            print("udpated the venue successfully")
+            flash("updated the Show successfully", "success")
+            print("udpated the Show successfully")
             return redirect("/admin/")
 
 
-@app.route("admin/deleteVenue", methods=["GET" , "POST"])
+@app.route("admin/deleteShow", methods=["GET" , "POST"])
 def deleteVenue():
     if not session.get("admin_id"):
         return redirect("/admin/")
-    form = DeleteVenueForm()
+    form = DeleteShowForm()
     if form.validate_on_submit():
-        old_venue = Venue().query.filter_by(name=form.name.data).first()
-        if old_venue=="":
-            print("did not find the venue")
-            flash("Did not found the venue for update", "danger")
+        old_show = Show().query.filter_by(name=form.name.data).first()
+        if old_show=="":
+            print("did not find the Show")
+            flash("Did not found the Show for update", "danger")
         else:
-            Venue.query.filter_by(name=form.name.data).delete()
-            print("deleted the venue successfully")
-            flash("Deleted the venue successfully", "success")
-        return redirect("/admin/")
+            Show().query.filter_by(name=form.name.data).delete()
+            print("deleted the Shoe successfully")
+            flash("Deleted the Show successfully", "success")
+            return redirect("/admin/")
 
-####################### api for show ############################################################
 
 
 ########################### api for show end ####################################################
