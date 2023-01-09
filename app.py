@@ -24,7 +24,20 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 class Venue(db.Model):
-    pass
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    place = db.Column(db.String(255), nullable=False)
+    capacity = db.Column(db.Interger, nullable=False)
+    shows = db.relationship("show", back_populates = "venue")
+
+class Show(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(100), nullable =False)
+    ratings = db.Column(db.Interger, nullable =False)
+    tags = db.Columns(db.String(255), nullable=False)
+    ticketPrice = db.Column(db.Integer, nullable =False)
+    venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"), nullable=False)
+    venue = db.relationship("venue", back_populates = "show")
 
 
 class User(db.Model):
