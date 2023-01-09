@@ -1,10 +1,10 @@
 from flask import Flask, render_template, url_for, redirect, request, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, EmailField
-from wtforms.validators import InputRequired, Length, ValidationError, Email
+from wtforms.validators import ValidationError
 from flask_bcrypt import Bcrypt
+
+from models import Venue, Show, User, Admin, AdminLoginForm, LoginForm, RegisterForm
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -23,52 +23,7 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-class Venue(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    place = db.Column(db.String(255), nullable=False)
-    capacity = db.Column(db.Interger, nullable=False)
-    shows = db.relationship("show", back_populates = "venue")
 
-class Show(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(100), nullable =False)
-    ratings = db.Column(db.Interger, nullable =False)
-    tags = db.Columns(db.String(255), nullable=False)
-    ticketPrice = db.Column(db.Integer, nullable =False)
-    venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"), nullable=False)
-    venue = db.relationship("venue", back_populates = "show")
-
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), nullable=False, unique=True)
-    firstname= db.Column(db.String(40), nullable=True)
-    lastname = db.Column(db.String(40), nullable=True)
-    email    = db.Column(db.String(100), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
-    
-    def __repr__(self):
-        return f'User("{self.id}","{self.username},"{self.firstname}","{self.lastname}","{self.email}"'
-
-
-class Admin(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
-    username = db.Column(db.String(255), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
-    
-    def __repr__(self):
-        return f'Admin("{self.username}","{self.id}")'
-
-
-class AdminLoginForm(FlaskForm):
-    username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
-
-    password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
-
-    submit = SubmitField('Login')
 
 
 db.create_all()
@@ -171,53 +126,6 @@ def adminLogout():
         session['admin_name']=None
         return redirect('/')
 # -------------------------use
-
-class RegisterForm(FlaskForm):
-    username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
-    firstname= StringField(validators=[
-                            InputRequired(), Length(max=40)], render_kw={"placeholder":"First Name"})
-    lastname= StringField(Validators=[
-                            InputRequired(), Length(max=40)], render_kw={"placeholder":"Last Name"})
-    email= EmailField("Email Address", validators=[InputRequired(), Email()], render_kw={"placeholder","tusharemail"})                    
-    password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
-
-    submit = SubmitField('Register')
-
-    def validate_username(self, username):
-        existing_user_username = User.query.filter(
-            username=username.data).first()
-        if existing_user_username:
-            raise ValidationError(
-                'That username or Email already exists. Please choose a different one.')
-
-
-class LoginForm(FlaskForm):
-    username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
-
-    password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
-
-    submit = SubmitField('Login')
-
-class UpdateVenueForm(FlaskForm):
-    pass
-
-class AddVenueForm(FlaskForm):
-    pass
-class DeleteVenueForm(FlaskForm):
-    pass
-
-class AddShowForm(FlaskForm):
-    pass
-
-class UpdateShowForm(FlaskForm):
-    pass
-
-class DeleteShowForm(FlaskForm):
-    pass
 
 
 
