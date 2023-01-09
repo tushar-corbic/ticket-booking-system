@@ -33,7 +33,7 @@ db.create_all()
 def index():
     return render_template('index.html',title="")
 
-
+################################# api for admin login##############################################3
 #admin login
 @app.route("/admin/", methods=["GET","POST"])
 def adminIndex():
@@ -126,14 +126,14 @@ def adminLogout():
         session['admin_name']=None
         return redirect('/')
 # -------------------------use
-
+######################################### api for admin login end ####################################
 
 
 # @app.route('/')
 # def home():
 #     return render_template('home.html')
 
-
+########################################## api for user login ######################################3
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -182,6 +182,8 @@ def register():
 
 
     return render_template('register.html', form=form)
+############################################# api for user login end ###############################33
+
 
 ######################### api for venue##################################################
 @app.route("/admin/addVenue", methods=["GET", "POST"])
