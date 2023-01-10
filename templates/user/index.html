@@ -20,17 +20,23 @@
                 <div class="card-body">
                     <form action="" method="POST">
                         <div class="my-2">
-                            <label for=""><b>Enter Your Email</b></label>
-                            <input type="email" name="email" id="email" class="form-control my-1">
+                            <label for=""><b>Enter Your Username</b></label>
+                            <span class="form-control my-1 ">{{ form.username }}</span>
+                            <!-- <input type="text" name="fname" id="fname" class="form-control my-1"> -->
+                            
                         </div>
                         <div class="my-2">
                             <label for=""><b>Enter Your Password</b></label>
-                            <input type="password" name="password" id="password" class="form-control my-1">
+                            <span class="form-control my-1 ">{{ form.password }}</span>
+                            <!-- <input type="text" name="lname" id="lname" class="form-control my-1"> -->
                         </div>
-                        <button class="btn btn-success">Login</button>
-                        <span class="d-flex align-items-center">If you have't Account ? <a href="/user/signup"
-                                class="text-center nav-link">Signup</a></span>
+                      
+                        <span class="btn btn-success">{{ form.submit }}</span>
+
+                        <span class="d-flex align-items-center">If you have't Account ? <a href="/signupindex/"
+                            class="text-center nav-link">Signup</a></span>
                     </form>
+                    
                 </div>
             </div>
         </div>

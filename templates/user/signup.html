@@ -18,33 +18,40 @@
             {% endwith %}
             <div class="card">
                 <div class="card-body">
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                    </form>
                     <form action="" method="POST">
                         <div class="my-2">
                             <label for=""><b>Enter Your First Name</b></label>
-                            <input type="text" name="fname" id="fname" class="form-control my-1">
+                            <span class="form-control my-1 ">{{ form.firstname }}</span>
+                            <!-- <input type="text" name="fname" id="fname" class="form-control my-1"> -->
+                            
                         </div>
                         <div class="my-2">
                             <label for=""><b>Enter Your Last Name</b></label>
-                            <input type="text" name="lname" id="lname" class="form-control my-1">
+                            <span class="form-control my-1 ">{{ form.lastname }}</span>
+                            <!-- <input type="text" name="lname" id="lname" class="form-control my-1"> -->
                         </div>
                         <div class="my-2">
                             <label for=""><b>Enter Your UserName</b></label>
-                            <input type="text" name="username" id="username" class="form-control my-1">
+                            <span class="form-control my-1 ">{{ form.username }}</span>
+                            <!-- <input type="text" name="username" id="username" class="form-control my-1"> -->
                         </div>
                         <div class="my-2">
                             <label for=""><b>Enter Your Email</b></label>
-                            <input type="email" name="email" id="email" class="form-control my-1">
-                        </div>
-                        <div class="my-2">
-                            <label for=""><b>Enter Your Education</b></label>
-                            <input type="text" name="edu" id="edu" class="form-control my-1">
+                            <span class="form-control my-1 ">{{ form.email }}</span>
+                            <!-- <input type="email" name="email" id="email" class="form-control my-1"> -->
                         </div>
                         <div class="my-2">
                             <label for=""><b>Enter Your Password</b></label>
-                            <input type="password" name="password" id="password" class="form-control my-1">
+                            <span class="form-control my-1 ">{{ form.password }}</span>
                         </div>
-                        <button class="btn btn-success">Signup</button>
-                        <span class="d-flex align-items-center">Already Account ? <a href="/user/"
+                        <span class="btn btn-success">{{ form.submit }}</span>
+
+                        <!-- <button class="btn btn-success">Signup</button> -->
+                        <span class="d-flex align-items-center">Already Account ? <a href="/loginindex/"
                                 class="text-center nav-link">Login</a></span>
                     </form>
                 </div>
