@@ -161,6 +161,7 @@ def adminDashboard():
     all_venue = [(i.id, i.name) for i in Venue.query.all()]
     removevenueform.name.choices = all_venue
     addshowform.venue.choices = all_venue
+    removeshowform.name.choices = [(i.id, i.name) for i in Show.query.all()]
     return render_template('admin/dashboard.html',title="Admin Dashboard",addvenueform = addvenueform, removevenueform = removevenueform, addshowform=addshowform, removeshowform=removeshowform)
 
 # admin get all user 
@@ -263,8 +264,6 @@ def loginpage():
                     session["user_name"] = user.username
                     # login_user(user)
                     return redirect("/user/dashboard")
-        # raise ValidationError(
-        #             'Incorrect Password')
         flash("Incorrect Password ", "danger")
 
 
@@ -293,7 +292,6 @@ def signupindex():
                 email=form.email.data)
             db.session.add(new_user)
             db.session.commit()
-            print("_______________able to do registier_______")
             return redirect(url_for("loginpage"))
             # return redirect("user/login.html")
         else:
@@ -477,7 +475,7 @@ def gottoaddticketpage():
         form.venue_name.choices= [(i.id, i.name) for i in Venue.query.all()]
         return render_template("user/ticket.html", form = form)
 
-        
+
 @app.route("/user/addTicket/", methods=["GET", "POST"])
 # @login_required
 def addTicket():

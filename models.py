@@ -65,7 +65,7 @@ class AddVenueForm(FlaskForm):
 class DeleteVenueForm(FlaskForm):
     name= SelectField(validators=[InputRequired()], choices = [],render_kw={"placeholder":"Venue Name","class":"form-control my-1 "})
     # name= StringField(validators=[InputRequired(), Length(min=1, max=100)], render_kw={"placeholder":"Venue Name","class":"form-control my-1 "})
-    submit = SubmitField('Submit', render_kw={"class":"btn btn-danger"})
+    submit = SubmitField('Delete', render_kw={"class":"btn btn-danger"})
 
     def validate_venue_name(self, name):
         existing_venue_name=Venue.query.filter(name=name).first()
@@ -125,12 +125,12 @@ class DeleteShowForm(FlaskForm):
     # all_shows = [(i,j) for i,j in enumerate(all_shows)]
     all_shows=[]
     name= SelectField(validators=[InputRequired()],choices=all_shows ,render_kw={"placeholder":"Show Name","class":"form-control my-1 "})
-    submit = SubmitField('Delete', render_kw={"class":"btn btn-danger form-control my-1 ", "placeholder":"Delete"})
+    submit = SubmitField('Delete', render_kw={"placeholder":"Delete ","class":"btn btn-danger form-control my-1"})
 
-    def validate_show_name(self, name):
-        existing_show_name = Show().query.filter(name=name).first()
-        if existing_show_name=="":
-            raise ValidationError("Show Name Does not exxist")
+    # def validate_show_name(self, name):
+    #     existing_show_name = Show().query.filter(name=name).first()
+    #     if existing_show_name=="":
+    #         raise ValidationError("Show Name Does not exxist")
 
 class AddTicketForm(FlaskForm):
     # pass
