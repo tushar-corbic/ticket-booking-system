@@ -2,29 +2,30 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, EmailField, IntegerField,SelectMultipleField, SelectField
 from wtforms.validators import InputRequired, Length, ValidationError, Email, NumberRange
+# from app import Venue, User
 class AdminLoginForm(FlaskForm):
     username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username","class":"form-control my-1"})
 
     password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
+                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password","class":"form-control my-1"})
 
-    submit = SubmitField('Login')
+    submit = SubmitField('Login', render_kw={"class":"btn btn-success"})
 
 
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username","class":"form-control my-1 "})
     firstname= StringField(validators=[
-                            InputRequired(), Length(max=40)], render_kw={"placeholder":"First Name"})
+                            InputRequired(), Length(max=40)], render_kw={"placeholder":"First Name","class":"form-control my-1 "})
     lastname= StringField(validators=[
-                            InputRequired(), Length(max=40)], render_kw={"placeholder":"Last Name"})
-    email= EmailField("Email Address", validators=[InputRequired(), Email()], render_kw={"placeholder":"tusharemail"})                    
+                            InputRequired(), Length(max=40)], render_kw={"placeholder":"Last Name","class":"form-control my-1 "})
+    email= EmailField("Email Address", validators=[InputRequired(), Email()], render_kw={"placeholder":"tusharemail","class":"form-control my-1 "})                    
     password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
+                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password","class":"form-control my-1 "})
 
-    submit = SubmitField('Register')
+    submit = SubmitField('Register', render_kw={"class":"btn btn-success"})
 
     def validate_username(self, username):
         print("validatings")
@@ -41,32 +42,33 @@ class RegisterForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username","class":"form-control my-1 "})
 
     password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
+                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password","class":"form-control my-1 "})
 
-    submit = SubmitField('Login')
+    submit = SubmitField('Login', render_kw={"class":"btn btn-success"})
 
 class UpdateVenueForm(FlaskForm):
-    name= StringField(validators=[InputRequired(), Length(min=1, max=100)], render_kw={"placeholder":"Venue Name"})
-    place = StringField(Validators=[InputRequired(), Length(min=2, max=255)], render_kw={"placeholder":"Venue Place"})
-    capacity = IntegerField(Validators=[InputRequired()], render_kw={"placeholder":"Capacity"})  
+    name= StringField(validators=[InputRequired(), Length(min=1, max=100)], render_kw={"placeholder":"Venue Name","class":"form-control my-1 "})
+    place = StringField(Validators=[InputRequired(), Length(min=2, max=255)], render_kw={"placeholder":"Venue Place","class":"form-control my-1 "})
+    capacity = IntegerField(Validators=[InputRequired()], render_kw={"placeholder":"Capacity","class":"form-control my-1 "})  
     
 
 class AddVenueForm(FlaskForm):
-    name= StringField(validators=[InputRequired(), Length(min=1, max=100)], render_kw={"placeholder":"Venue Name"})
-    place = StringField(Validators=[InputRequired(), Length(min=2, max=255)], render_kw={"placeholder":"Venue Place"})
-    capacity = IntegerField(Validators=[InputRequired()], render_kw={"placeholder":"Capacity"})  
+    name= StringField(validators=[InputRequired(), Length(min=1, max=100)], render_kw={"placeholder":"Venue Name","class":"form-control my-1 "})
+    place = StringField(Validators=[InputRequired(), Length(min=2, max=255)], render_kw={"placeholder":"Venue Place","class":"form-control my-1 "})
+    capacity = IntegerField(Validators=[InputRequired()], render_kw={"placeholder":"Capacity","class":"form-control my-1 "})  
     
-    submit = SubmitField('Submit')
+    submit = SubmitField('Submit', render_kw={"class":"btn btn-success"})
 
 class DeleteVenueForm(FlaskForm):
-    name= StringField(validators=[InputRequired(), Length(min=1, max=100)], render_kw={"placeholder":"Venue Name"})
-    submit = SubmitField('Submit')
+    name= SelectField(validators=[InputRequired()], choices = [],render_kw={"placeholder":"Venue Name","class":"form-control my-1 "})
+    # name= StringField(validators=[InputRequired(), Length(min=1, max=100)], render_kw={"placeholder":"Venue Name","class":"form-control my-1 "})
+    submit = SubmitField('Submit', render_kw={"class":"btn btn-success"})
 
     def validate_venue_name(self, name):
-        existing_venue_name=Venue().query.filter(name=name).first()
+        existing_venue_name=Venue.query.filter(name=name).first()
         if existing_venue_name=="":
             raise ValidationError("VenueName Does not exist")
 
@@ -74,19 +76,19 @@ class DeleteVenueForm(FlaskForm):
 
 
 class AddShowForm(FlaskForm):
-    name= StringField(Validators=[InputRequired(), Length(min=1, max=100)], render_kw={"placeholder":"Show Name"})
-    ratings = IntegerField(Validators=[InputRequired(),  NumberRange(min=0, max=100)], render_kw={"placeholder":"Show Rating"})
+    name= StringField(Validators=[InputRequired(), Length(min=1, max=100)], render_kw={"placeholder":"Show Name","class":"form-control my-1 "})
+    ratings = IntegerField(Validators=[InputRequired(),  NumberRange(min=0, max=100)], render_kw={"placeholder":"Show Rating","class":"form-control my-1 "})
     tags = SelectMultipleField(u'Movie Genre', choices=[('Crime', 'Crime'), ('Thriller', 'Thriller'), 
                                                 ('Romance', 'Romance'),
                                                 ('Comedy', 'Comedy')])
-    ticketPrice = IntegerField(Validators=[InputRequired()], render_kw={"placeholder":"ticket price"})    
+    ticketPrice = IntegerField(Validators=[InputRequired()], render_kw={"placeholder":"ticket price","class":"form-control my-1 "})    
     # all_venue_id =[i.id for i in  Venue.query.all() ]
     # all_venue_name=[i.name for i in Venue.query().all()]
-    all_venue_id =[ ]
-    all_venue_name=[]
-    venue_choices = [j for i, j in enumerate(zip(all_venue_id, all_venue_name))]                                      
-    venue = SelectField(Validators=[InputRequired()], choices=venue_choices ,render_kw={"placeholder":"Venue"})
-    submit = SubmitField('Submit')
+    # all_venue_id =[ ]
+    # all_venue_name=[]
+    # venue_choices = [j for i, j in enumerate(zip(all_venue_id, all_venue_name))]                                      
+    venue = SelectField(Validators=[InputRequired()], choices=[] ,render_kw={"placeholder":"Venue","class":"form-control my-1 "})
+    submit = SubmitField('Submit', render_kw={"class":"btn btn-success"})
     
 
 
@@ -95,19 +97,19 @@ class UpdateShowForm(FlaskForm):
     # all_shows = [i.name for i in Show().query().all()]
     # all_shows = [(i,j) for i,j in enumerate(all_shows)]
     all_shows = []
-    name= SelectField(Validators=[InputRequired()],choices=all_shows ,render_kw={"placeholder":"Show Name"})
-    ratings = IntegerField(Validators=[InputRequired(),  NumberRange(min=0, max=100)], render_kw={"placeholder":"Show Rating"})
+    name= SelectField(Validators=[InputRequired()],choices=all_shows ,render_kw={"placeholder":"Show Name","class":"form-control my-1 "})
+    ratings = IntegerField(Validators=[InputRequired(),  NumberRange(min=0, max=100)], render_kw={"placeholder":"Show Rating","class":"form-control my-1 "})
     tags = SelectMultipleField(u'Movie Genre', choices=[('Crime', 'Crime'), ('Thriller', 'Thriller'), 
                                                 ('Romance', 'Romance'),
                                                 ('Comedy', 'Comedy')])
-    ticketPrice = IntegerField(Validators=[InputRequired()], render_kw={"placeholder":"ticket price"})  
+    ticketPrice = IntegerField(Validators=[InputRequired()], render_kw={"placeholder":"ticket price","class":"form-control my-1 "})  
     # all_venue_id =[i.id for i in  Venue.query.all() ]
     # all_venue_name=[i.name for i in Venue.query.all()]
     all_venue_id =[ ]
     all_venue_name=[]
     venue_choices = [j for i, j in enumerate(zip(all_venue_id, all_venue_name))]                                      
-    venue = SelectField(Validators=[InputRequired()], choices=venue_choices ,render_kw={"placeholder":"Venue"})
-    submit = SubmitField('Login')
+    venue = SelectField(Validators=[InputRequired()], choices=venue_choices ,render_kw={"placeholder":"Venue","class":"form-control my-1 "})
+    submit = SubmitField('Login', render_kw={"class":"btn btn-success"})
 
     def validate_show_name(self, name):
         existing_show_name = Show().query.filter(name=name).first()
@@ -119,15 +121,19 @@ class DeleteShowForm(FlaskForm):
     # all_shows = [i.name for i in Show().query().all()]
     # all_shows = [(i,j) for i,j in enumerate(all_shows)]
     all_shows=[]
-    name= SelectField(Validators=[InputRequired()],choices=all_shows ,render_kw={"placeholder":"Show Name"})
-    submit = SubmitField('Login')
+    name= SelectField(Validators=[InputRequired()],choices=all_shows ,render_kw={"placeholder":"Show Name","class":"form-control my-1 "})
+    submit = SubmitField('Login', render_kw={"class":"btn btn-success"})
 
     def validate_show_name(self, name):
         existing_show_name = Show().query.filter(name=name).first()
         if existing_show_name=="":
             raise ValidationError("Show Name Does not exxist")
 
-
+class AddTicketForm(FlaskForm):
+    venue_name = SelectField(Validators=[InputRequired()], choices = [], render_kw = {"placeholder":"Venue names","class":"form-control my-1 "})
+    show_name = SelectField(Validators = [InputRequired()], choices=[], render_kw = {"placeholder":"Show name","class":"form-control my-1 "})
+    ticketqty = IntegerField(Validators=[InputRequired()], render_kw = {"placeholder":"Ticket Qty", "class":"form-control my-1 "})
+    submit = SubmitField("submit", render_kw={"class":"btn btn-success"})
 # from flask_wtf import FlaskForm
 # from wtforms import StringField, PasswordField, SubmitField, EmailField, IntegerField,SelectMultipleField, SelectField
 # from wtforms.validators import InputRequired, Length, ValidationError, Email, NumberRange

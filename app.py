@@ -6,7 +6,7 @@ from flask_bcrypt import Bcrypt
 
 
 import os
-from models import AdminLoginForm, LoginForm, RegisterForm, AddVenueForm, AddShowForm, UpdateShowForm, UpdateVenueForm, DeleteShowForm, DeleteVenueForm
+from models import AdminLoginForm, LoginForm, RegisterForm, AddVenueForm, AddShowForm, UpdateShowForm, UpdateVenueForm, DeleteShowForm, DeleteVenueForm, AddTicketForm
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -367,6 +367,8 @@ def deleteVenue():
     if not session.get("admin_id"):
         return redirect("/admin/")
     form = DeleteVenueForm()
+    all_venue = [(i.id, i.name) for i in Venue.query().all()]
+    form.name.choices = all_venue
     if form.validate_on_submit():
         old_venue = Venue().query.filter_by(name=form.name.data).first()
         if old_venue=="":
@@ -389,6 +391,8 @@ def addShow():
     if not session.get('admin_id'):
         return redirect('/admin/')
     form = AddShowForm()
+    all_venue = [(i.id, i.name) for i in Venue.query().all()]
+    form.venue.choices = all_venue
     if form.validate_on_submit():
         new_show = Show(name=form.name.data,ratings = form.ratings.data, tags = form.tags.data, ticketPrice = form.ticketPrice.data,
                         Venue= form.venue.data)
@@ -404,6 +408,8 @@ def updateShow():
     if not session.get("admin_id"):
         return redirect("/admin/")
     form = UpdateShowForm()
+    all_venue = [(i.id, i.name) for i in Venue.query().all()]
+    form.venue.choices = all_venue
     if form.validate_on_submit():
         old_show = Show().query.filter_by(name=form.name.data).first()
         if old_show=="":
@@ -422,6 +428,8 @@ def deleteShow():
     if not session.get("admin_id"):
         return redirect("/admin/")
     form = DeleteShowForm()
+    all_venue = [(i.id, i.name) for i in Venue.query().all()]
+    form.venue.choices = all_venue
     if form.validate_on_submit():
         old_show = Show().query.filter_by(name=form.name.data).first()
         if old_show=="":
@@ -438,11 +446,26 @@ def deleteShow():
 ########################### api for show end ####################################################
 
 ############################ api for ticket booking #############################################
-# @app.route("/user/addTicket", method=["GET", "POST"])
-# @login_required
-# def addTicket():
-#     pass
-#     # if session["user_id"]!=None and session["user_name"]!=None:
+@app.route("/user/addTicket", methods=["GET", "POST"])
+@login_required
+def addTicket():
+    # pass
+    if session["user_id"]!=None and session["user_name"]!=None:
+        form = AddTicketForm()
+        form.show_name.choices = [(i.id, i.name) for i in Show.query.all()]
+        form.venue_name.choices= [(i.id, i.name) for i in Venue.query.all()]
+        if request.method=='POST':
+            selected_venue_name = form.venue_name.data
+            form.show_name.choices = [(i.id,i.name) for i in Show.query.filter_by(venue_id=selected_venue_name).all()]
+            print([(i.id,i.name) for i in Show.query.filter_by(venue_id=selected_venue_name).all()])
+            selected_show_name = form.show_name.data
+            selected_show = Show.query.filter_by(name=selected_show_name).first()
+            new_ticket= Ticket(showname=selected_show_name,venuename=selected_venue_name, ticketqty=form.ticketqty.data,customerid=session["user_id"], ticketprice = selected_show.ticketPrice )
+            db.session.add(new_ticket)
+            db.session.commit()
+            return redirect(url_for("userDashboard"))
+            pass
+    
 
 
 @app.route("/user/deleteTicket")
