@@ -1,0 +1,44 @@
+{% extends "user/layout.html"%}
+
+{% block content %}
+<div class="container">
+    {% with messages=get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category,message in messages %}
+    <div class="alert alert-{{category}}">
+        <strong>{{message}}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    {% include 'user/navbar.html' %}
+    <div class="container">
+        <div class="my-2">
+            <div class="table-responsive">
+                <form action="" method="POST">
+                    <div class="my-2">
+                        <label for=""><b>Select the venue </b></label>
+                        <span class="form-control my-1 ">{{ form.venue_name }}</span>
+                        <!-- <input type="text" name="fname" id="fname" class="form-control my-1"> -->
+                        
+                    </div>
+                    <div class="my-2">
+                        <label for=""><b>Select the show</b></label>
+                        <span class="form-control my-1 ">{{ form.show_name }}</span>
+                        <!-- <input type="text" name="lname" id="lname" class="form-control my-1"> -->
+                    </div>
+                    <div class="my-2">
+                        <label for=""><b>Enter Qty</b></label>
+                        <span class="form-control my-1 ">{{ form.ticketqty }}</span>
+                        <!-- <input type="text" name="lname" id="lname" class="form-control my-1"> -->
+                    </div>
+                  
+                    <span class="btn btn-success">{{ form.submit }}</span>
+
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

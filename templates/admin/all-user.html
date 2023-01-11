@@ -21,19 +21,17 @@
                         <th>Last Name</th>
                         <th>Username</th>
                         <th>Email</th>
-                        <th>Edu</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in users %}
                     <tr>
                         <td>{{user.id}}</td>
-                        <td>{{user.fname}}</td>
-                        <td>{{user.lname}}</td>
+                        <td>{{user.firstname}}</td>
+                        <td>{{user.lastname}}</td>
                         <td>{{user.username}}</td>
                         <td>{{user.email}}</td>
-                        <td>{{user.edu}}</td>
-                        <td>
+                        <!-- <td>
                             {% if user.status == 1 %}
                             Approved
                             {% else %}
@@ -41,7 +39,7 @@
                                 <button class="btn btn-warning">Approve</button>
                             </a>
                             {% endif %}
-                        </td>
+                        </td> -->
                     </tr>
                     {% endfor %}
                 </tbody>

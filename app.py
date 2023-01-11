@@ -132,7 +132,10 @@ def adminIndex():
             flash("Please enter all the fields", "danger")
             return redirect("/admin/")
         else:
+            # hashVar =bcrypt.generate_password_hash(password)
+            # print(hashVar,"------------------------")
             admins = Admin.query.filter_by(username=username).first()
+
             if admins and bcrypt.check_password_hash(admins.password, password):
                 session["admin_id"] = admins.id 
                 session["admin_name"] = admins.username
@@ -148,10 +151,17 @@ def adminIndex():
 def adminDashboard():
     if not session.get("admin_id"):
         return redirect("/admin/")
-    totalUser=User.query.count()
-    totalApprove=User.query.filter_by(status=1).count()
-    NotTotalApprove=User.query.filter_by(status=0).count()
-    return render_template('admin/dashboard.html',title="Admin Dashboard",totalUser=totalUser,totalApprove=totalApprove,NotTotalApprove=NotTotalApprove)
+    # totalUser=User.query.count()
+    # totalApprove=User.query.filter_by(status=1).count()
+    # NotTotalApprove=User.query.filter_by(status=0).count()
+    addvenueform = AddVenueForm()
+    removevenueform = DeleteVenueForm()
+    addshowform = AddShowForm()
+    removeshowform = DeleteShowForm()
+    all_venue = [(i.id, i.name) for i in Venue.query.all()]
+    removevenueform.name.choices = all_venue
+    addshowform.venue.choices = all_venue
+    return render_template('admin/dashboard.html',title="Admin Dashboard",addvenueform = addvenueform, removevenueform = removevenueform, addshowform=addshowform, removeshowform=removeshowform)
 
 # admin get all user 
 @app.route('/admin/get-all-user', methods=["POST","GET"])
@@ -160,7 +170,8 @@ def adminGetAllUser():
         return redirect('/admin/')
     if request.method== "POST":
         search=request.form.get('search')
-        users=User.query.filter(User.username.like('%'+search+'%')).all()
+        users = User.query.all()
+        # users=User.query.filter(User.username.like('%'+search+'%')).all()
         return render_template('admin/all-user.html',title='Approve User',users=users)
     else:
         users=User.query.all()
@@ -271,9 +282,7 @@ def adminindex():
 
 @app.route("/signupindex/", methods=["GET", "POST"])
 def signupindex():
-    print("this is firmt")
     form = RegisterForm()
-    print("isnafdna")
     if request.method == 'POST':
         if form.validate_on_submit()==False:
             hashed_password = bcrypt.generate_password_hash(form.password.data)
@@ -297,14 +306,18 @@ def signupindex():
 #     return render_template('dashboard.html')
 
 
-@app.route('/logout')
+@app.route('/logout/', methods=["POST","GET"])
 @login_required
 def logout():
-    session["user_id"]=None
-    session["user_name"] = None
-    # logout_user()
-    print("logouut--------------------")
-    return redirect("/")
+    print("asfd------------")
+    if request.method=='POST':
+        if session["user_id"]!=None and session["user_name"]!=None:
+            session["user_id"]=None
+            session["user_name"] = None
+            # logout_user()
+            print("logouut--------------------")
+            return redirect(url_for("index"))
+            # return redirect("/")
 
 
 @ app.route('/register', methods=['GET', 'POST'])
@@ -335,12 +348,12 @@ def addVenue():
     if not session.get('admin_id'):
         return redirect('/admin/')
     form = AddVenueForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit()==False:
         new_venue = Venue(name=form.name.data,place = form.place.data, capacity = form.capacity.data)
         db.session.add(new_venue)
         db.session.commit()
         flash("added the venue successfully", "success")
-        return redirect("/admin/")
+        return redirect("/admin/dashboard")
     print("could not add the venue")
     raise ValidationError("Could not add Venue!!!!")
 
@@ -367,18 +380,23 @@ def deleteVenue():
     if not session.get("admin_id"):
         return redirect("/admin/")
     form = DeleteVenueForm()
-    all_venue = [(i.id, i.name) for i in Venue.query().all()]
-    form.name.choices = all_venue
-    if form.validate_on_submit():
-        old_venue = Venue().query.filter_by(name=form.name.data).first()
+    # all_venue = [(i.id, i.name) for i in Venue.query().all()]
+    # form.name.choices = all_venue
+    if form.validate_on_submit()==False:
+        print(form.name.data,"-----------------------------")
+        old_venue = Venue.query.filter_by(id=form.name.data).first()
+        print(Venue.query.all())
+        print(old_venue,"----------------------------")
         if old_venue=="":
             print("did not find the venue")
             flash("Did not found the venue for update", "danger")
+            return render_template("admin/dashboard.html")
         else:
-            Venue.query.filter_by(name=form.name.data).delete()
+            Venue.query.filter_by(id=form.name.data).delete()
+            db.session.commit()
             print("deleted the venue successfully")
             flash("Deleted the venue successfully", "success")
-            return redirect("/admin/")
+            return redirect("/admin/dashboard")
 
 ####################### api for venue end ########################################################3
 
@@ -391,17 +409,20 @@ def addShow():
     if not session.get('admin_id'):
         return redirect('/admin/')
     form = AddShowForm()
-    all_venue = [(i.id, i.name) for i in Venue.query().all()]
+    all_venue = [(i.id, i.name) for i in Venue.query.all()]
     form.venue.choices = all_venue
-    if form.validate_on_submit():
+    if form.validate_on_submit()==False:
         new_show = Show(name=form.name.data,ratings = form.ratings.data, tags = form.tags.data, ticketPrice = form.ticketPrice.data,
-                        Venue= form.venue.data)
+                        venue_id= form.venue.data)
         db.session.add(new_show)
         db.session.commit()
         flash("added the Show successfully", "success")
-        return redirect("/admin/")
+        return redirect("/admin/dashboard")
     print("could not add the Show")
-    raise ValidationError("Could not add Show!!!!")
+    flash("Could not add Show!!!!")
+    return redirect("/admin/dashboard")
+
+    # raise ValidationError("Could not add Show!!!!")
 
 @app.route("/admin/updateShow", methods=["GET", "POST"])
 def updateShow():
@@ -428,35 +449,47 @@ def deleteShow():
     if not session.get("admin_id"):
         return redirect("/admin/")
     form = DeleteShowForm()
-    all_venue = [(i.id, i.name) for i in Venue.query().all()]
-    form.venue.choices = all_venue
-    if form.validate_on_submit():
-        old_show = Show().query.filter_by(name=form.name.data).first()
+    all_show = [(i.id, i.name) for i in Show.query.all()]
+    form.name.choices = all_show
+    if form.validate_on_submit()==False:
+        old_show = Show.query.filter_by(id=form.name.data).first()
         if old_show=="":
-            print("did not find the Show")
+            # print("did not find the Show")
             flash("Did not found the Show for update", "danger")
+            return redirect("/admin/dashboard")
         else:
-            Show().query.filter_by(name=form.name.data).delete()
-            print("deleted the Shoe successfully")
+            Show.query.filter_by(id=form.name.data).delete()
+            db.session.commit()
+            # print("deleted the Shoe successfully")
             flash("Deleted the Show successfully", "success")
-            return redirect("/admin/")
+            return redirect("/admin/dashboard")
 
 
 
 ########################### api for show end ####################################################
 
 ############################ api for ticket booking #############################################
-@app.route("/user/addTicket", methods=["GET", "POST"])
-@login_required
-def addTicket():
-    # pass
+@app.route("/user/gotoaddticketpage")
+def gottoaddticketpage():
     if session["user_id"]!=None and session["user_name"]!=None:
         form = AddTicketForm()
         form.show_name.choices = [(i.id, i.name) for i in Show.query.all()]
         form.venue_name.choices= [(i.id, i.name) for i in Venue.query.all()]
-        if request.method=='POST':
+        return render_template("user/ticket.html", form = form)
+
+        
+@app.route("/user/addTicket/", methods=["GET", "POST"])
+# @login_required
+def addTicket():
+    if session["user_id"]!=None and session["user_name"]!=None:
+        form = AddTicketForm()
+        # form.show_name.choices = [(i.id, i.name) for i in Show.query.all()]
+        # form.venue_name.choices= [(i.id, i.name) for i in Venue.query.all()]
+        # if request.method=='POST':
+        if form.validate_on_submit():
             selected_venue_name = form.venue_name.data
             form.show_name.choices = [(i.id,i.name) for i in Show.query.filter_by(venue_id=selected_venue_name).all()]
+            print("---------------------------------------------")
             print([(i.id,i.name) for i in Show.query.filter_by(venue_id=selected_venue_name).all()])
             selected_show_name = form.show_name.data
             selected_show = Show.query.filter_by(name=selected_show_name).first()
@@ -464,7 +497,11 @@ def addTicket():
             db.session.add(new_ticket)
             db.session.commit()
             return redirect(url_for("userDashboard"))
-            pass
+        elif request.method=='GET':
+            return redirect("/user/ticket.html")
+        return redirect(url_for("userDashboard"))
+    else:
+            return redirect("/")
     
 
 

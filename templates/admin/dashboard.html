@@ -4,25 +4,96 @@
     {% include 'admin/navbar.html' %}
 </div>
 <div class="container">
-    <div class="row">
-        <div class="col-xl-6 my-2 col-lg-6 col-sm-12">
-            <div class="bg-success d-flex p-3 justify-content-between align-items-center">
-                <h2>Total User</h2>
-                <h4>{{totalUser}}</h4>
+    
+    <div class="row" style="margin-bottom: 40px;">
+        <h1> Add Venue Form</h1>
+        <form action="/admin/addVenue" method="POST">
+            <div class="my-2">
+                <label for=""><b>Write the venue </b></label>
+                <span class="form-control  my-2">{{ addvenueform.name }}</span>
+                <!-- <input type="text" name="fname" id="fname" class="form-control my-1"> -->
+                
             </div>
-        </div>
-        <div class="col-xl-6 my-2 col-lg-6 col-sm-12">
-            <div class="bg-warning d-flex p-3 justify-content-between align-items-center">
-                <h2>Approved User</h2>
-                <h4>{{totalApprove}}</h4>
+            <div class="my-2">
+                <label for=""><b>Write the place</b></label>
+                <span class="form-control my-1 ">{{ addvenueform.place }}</span>
+                <!-- <input type="text" name="lname" id="lname" class="form-control my-1"> -->
             </div>
-        </div>
-        <div class="col-xl-6 my-2 col-lg-6 col-sm-12">
-            <div class="bg-primary d-flex p-3 justify-content-between align-items-center">
-                <h2>DisApprove User</h2>
-                <h4>{{NotTotalApprove}}</h4>
+            <div class="my-2">
+                <label for=""><b>Enter Qty</b></label>
+                <span class="form-control my-1 ">{{ addvenueform.capacity }}</span>
+                <!-- <input type="text" name="lname" id="lname" class="form-control my-1"> -->
             </div>
-        </div>
+          
+            <span class="btn btn-success">{{ addvenueform.submit }}</span>
+
+            
+        </form>
+    </div>
+    <div class="row" style="margin-bottom: 40px;">
+        <h1> Delete Venue Form</h1>
+        <form action="/admin/deleteVenue" method="POST">
+            <div class="my-2">
+                <label for=""><b>Select the venue </b></label>
+                <span class="form-control  my-2">{{ removevenueform.name }}</span>
+                <!-- <input type="text" name="fname" id="fname" class="form-control my-1"> -->
+                
+            </div>
+          
+            <span class="btn btn-danger">{{ removevenueform.submit }}</span>
+
+            
+        </form>
+        <br>
+        <br>
+    </div>
+    <div class="row" style="margin-bottom: 40px;">
+        <h1> Add Show Form</h1>
+        <form action="/admin/addShow" method="POST">
+            <div class="my-1">
+                <label for=""><b>Write the Show name </b></label>
+                <span class="form-control  my-2">{{ addshowform.name }}</span>
+                <!-- <input type="text" name="fname" id="fname" class="form-control my-1"> -->
+                
+            </div>
+            <div class="my-1">
+                <label for=""><b>Give the ratings</b></label>
+                <span class="form-control my-1 ">{{ addshowform.ratings }}</span>
+                <!-- <input type="text" name="lname" id="lname" class="form-control my-1"> -->
+            </div>
+            <div class="my-2">
+                <label for=""><b>Select the genre</b></label>
+                <span class="form-control my-1 ">{{ addshowform.tags }}</span>
+                <!-- <input type="text" name="lname" id="lname" class="form-control my-1"> -->
+            </div>
+            <div class="my-2">
+                <label for=""><b>Enter Ticket Price</b></label>
+                <span class="form-control my-1 ">{{ addshowform.ticketPrice }}</span>
+                <!-- <input type="text" name="lname" id="lname" class="form-control my-1"> -->
+            </div>
+            <div class="my-2">
+                <label for=""><b>select Venue</b></label>
+                <span class="form-control my-1 ">{{ addshowform.venue }}</span>
+                <!-- <input type="text" name="lname" id="lname" class="form-control my-1"> -->
+            </div>
+            <span class="btn btn-success">{{ addvenueform.submit }}</span>
+
+            
+        </form>
+    </div>
+    <div class="row" style="margin-bottom: 40px;">
+        <h1> Remove Show Form</h1>
+        <form action="/admin/deleteShow" method="POST">
+            <div class="my-1">
+                <label for=""><b>Select Show name </b></label>
+                <span class="form-control  my-2">{{ removeshowform.name }}</span>
+                <!-- <input type="text" name="fname" id="fname" class="form-control my-1"> -->
+                
+            </div>
+            <span class="btn btn-danger">{{ addvenueform.submit }}</span>
+
+            
+        </form>
     </div>
 </div>
 {% endblock content %}
