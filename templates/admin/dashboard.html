@@ -4,8 +4,19 @@
     {% include 'admin/navbar.html' %}
 </div>
 <div class="container">
-    
+    <!-- <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12"> -->
+        {% with messages=get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category,message in messages %}
+        <div id = "alertmessage" class="alert alert-{{category}}">
+            <strong>{{message}}</strong>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    <!-- </div> -->
     <div class="row" style="margin-bottom: 40px;">
+        
         <h1> Add Venue Form</h1>
         <form action="/admin/addVenue" method="POST">
             <div class="my-2">

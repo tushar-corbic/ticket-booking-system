@@ -27,15 +27,15 @@ class RegisterForm(FlaskForm):
 
     submit = SubmitField('Register', render_kw={"class":"btn btn-success"})
 
-    def validate_username(self, username):
-        print("validatings")
-        existing_user_username = User.query.filter_by(
-            username=username.data).first()
-        if existing_user_username:
-            print("gettinga  validation error")
+    # def validate_username(self, username):
+    #     print("validatings")
+    #     existing_user_username = User.query.filter_by(
+    #         username=username.data).first()
+    #     if existing_user_username:
+    #         print("gettinga  validation error")
 
-            raise ValidationError(
-                'That username or Email already exists. Please choose a different one.')
+    #         raise ValidationError(
+    #             'That username or Email already exists. Please choose a different one.')
 
 
 

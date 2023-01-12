@@ -1,9 +1,9 @@
-from flask import Flask, render_template, url_for, redirect, request, flash, session
+from flask import Flask, render_template, url_for, redirect, request, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from wtforms.validators import ValidationError
 from flask_bcrypt import Bcrypt
-
+# from json import jsonfy
 
 import os
 from models import AdminLoginForm, LoginForm, RegisterForm, AddVenueForm, AddShowForm, UpdateShowForm, UpdateVenueForm, DeleteShowForm, DeleteVenueForm, AddTicketForm
@@ -72,7 +72,7 @@ class User(db.Model):
     firstname= db.Column(db.String(40), nullable=True)
     lastname = db.Column(db.String(40), nullable=True)
     email    = db.Column(db.String(100), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     
     def __init__(self, username, firstname, lastname, email, password):
         self.username =username
@@ -272,8 +272,16 @@ def loginpage():
 @app.route("/user/dashboard")
 def userDashboard():
     if session["user_id"]!=None and session["user_name"]!=None:
+
+        class_entry_relations = get_dropdown_values()
+
+        default_classes = sorted(class_entry_relations.keys())
+        default_values = class_entry_relations[default_classes[0]]
+        addticketform = AddTicketForm()
         all_tickets = Ticket.query.filter_by(customerid=session["user_id"]).all()
-        return render_template("user/dashboard.html", tickets = all_tickets)
+        return render_template("user/dashboard.html", tickets = all_tickets, addticketform=addticketform,  all_classes=default_classes, all_entries=default_values)
+
+
 @app.route("/adminindex/", methods=["GET", "POST"])
 def adminindex():
     return render_template("admin/index.html")
@@ -303,6 +311,30 @@ def signupindex():
 
 #     return render_template('dashboard.html')
 
+@app.route("/user/change_password", methods=["POST", "GET"])
+def change_password():
+    if session["user_name"]!=None and session["user_id"]!=None:
+        if request.method=='POST':
+            username = request.form["username"]
+            old_password = request.form["old_password"]
+            old_user = User.query.filter_by(username=username).first()
+            print(old_user, "first")
+            
+            # print(old_user, "---------------------------")
+            if old_user!=None:
+                new_password = request.form["new_password"]
+                old_user = User.query.filter_by(username=username, password = bcrypt.generate_password_hash(old_password)).first()
+                print(old_user, "second")
+                if old_user!=None:
+                    new_hashed_password = bcrypt.generate_password_hash(new_password)
+                    user = User.query.filter_by(username=username).update(dict(password = new_hashed_password))
+                    db.session.commit()
+                    flash("Password changed successfully", "success")
+                else:
+                    flash("wrong password ", 'danger')
+            else:
+                flash("wrong username","danger")
+    return render_template("user/change-password.html")
 
 @app.route('/logout/', methods=["POST","GET"])
 @login_required
@@ -347,11 +379,15 @@ def addVenue():
         return redirect('/admin/')
     form = AddVenueForm()
     if form.validate_on_submit()==False:
-        new_venue = Venue(name=form.name.data,place = form.place.data, capacity = form.capacity.data)
-        db.session.add(new_venue)
-        db.session.commit()
-        flash("added the venue successfully", "success")
-        return redirect("/admin/dashboard")
+        if Venue.query.filter_by(name=form.name.data).all()==[]:
+            new_venue = Venue(name=form.name.data,place = form.place.data, capacity = form.capacity.data)
+            db.session.add(new_venue)
+            db.session.commit()
+            flash("added the venue successfully", "success")
+            return redirect("/admin/dashboard")
+        else:
+            flash("Venue already exist", "danger")
+            return redirect("/admin/dashboard")
     print("could not add the venue")
     raise ValidationError("Could not add Venue!!!!")
 
@@ -381,10 +417,10 @@ def deleteVenue():
     # all_venue = [(i.id, i.name) for i in Venue.query().all()]
     # form.name.choices = all_venue
     if form.validate_on_submit()==False:
-        print(form.name.data,"-----------------------------")
+        # print(form.name.data,"-----------------------------")
         old_venue = Venue.query.filter_by(id=form.name.data).first()
-        print(Venue.query.all())
-        print(old_venue,"----------------------------")
+        # print(Venue.query.all())
+        # print(old_venue,"----------------------------")
         if old_venue=="":
             print("did not find the venue")
             flash("Did not found the venue for update", "danger")
@@ -410,12 +446,16 @@ def addShow():
     all_venue = [(i.id, i.name) for i in Venue.query.all()]
     form.venue.choices = all_venue
     if form.validate_on_submit()==False:
-        new_show = Show(name=form.name.data,ratings = form.ratings.data, tags = form.tags.data, ticketPrice = form.ticketPrice.data,
-                        venue_id= form.venue.data)
-        db.session.add(new_show)
-        db.session.commit()
-        flash("added the Show successfully", "success")
-        return redirect("/admin/dashboard")
+        if Show.query.filter_by(name=form.name.data, venue_id=form.venue.data).all()==[]:
+            new_show = Show(name=form.name.data,ratings = form.ratings.data, tags = form.tags.data, ticketPrice = form.ticketPrice.data,
+                            venue_id= form.venue.data)
+            db.session.add(new_show)
+            db.session.commit()
+            flash("added the Show successfully", "success")
+            return redirect("/admin/dashboard")
+        else:
+            flash("Show already exist", "danger")
+            return redirect("/admin/dashboard")
     print("could not add the Show")
     flash("Could not add Show!!!!")
     return redirect("/admin/dashboard")
@@ -470,10 +510,13 @@ def deleteShow():
 @app.route("/user/gotoaddticketpage")
 def gottoaddticketpage():
     if session["user_id"]!=None and session["user_name"]!=None:
-        form = AddTicketForm()
-        form.show_name.choices = [(i.id, i.name) for i in Show.query.all()]
-        form.venue_name.choices= [(i.id, i.name) for i in Venue.query.all()]
-        return render_template("user/ticket.html", form = form)
+        # form = AddTicketForm()
+        pass
+        # form.show_name.choices = [(i.id, i.name) for i in Show.query.all()]
+        # form.venue_name.choices= [(i.id, i.name) for i in Venue.query.all()]
+        # return render_template("user/ticket.html", form = form)
+    return render_template("user/ticket.html")
+
 
 
 @app.route("/user/addTicket/", methods=["GET", "POST"])
@@ -482,21 +525,27 @@ def addTicket():
     if session["user_id"]!=None and session["user_name"]!=None:
         form = AddTicketForm()
         # form.show_name.choices = [(i.id, i.name) for i in Show.query.all()]
-        # form.venue_name.choices= [(i.id, i.name) for i in Venue.query.all()]
-        # if request.method=='POST':
-        if form.validate_on_submit():
-            selected_venue_name = form.venue_name.data
-            form.show_name.choices = [(i.id,i.name) for i in Show.query.filter_by(venue_id=selected_venue_name).all()]
-            print("---------------------------------------------")
-            print([(i.id,i.name) for i in Show.query.filter_by(venue_id=selected_venue_name).all()])
-            selected_show_name = form.show_name.data
-            selected_show = Show.query.filter_by(name=selected_show_name).first()
-            new_ticket= Ticket(showname=selected_show_name,venuename=selected_venue_name, ticketqty=form.ticketqty.data,customerid=session["user_id"], ticketprice = selected_show.ticketPrice )
-            db.session.add(new_ticket)
-            db.session.commit()
-            return redirect(url_for("userDashboard"))
-        elif request.method=='GET':
-            return redirect("/user/ticket.html")
+        form.venue_name.choices= [(i.id, i.name) for i in Venue.query.all()]
+        if request.method=='POST':
+            # selected_venue_name = form.venue_name.data
+            # form.show_name.choices = [(i.id,i.name) for i in Show.query.filter_by(venue_id=selected_venue_name).all()]
+            # print([(i.id,i.name) for i in Show.query.filter_by(venue_id=selected_venue_name).all()])
+            # selected_show_name = form.show_name.data
+            # selected_show = Show.query.filter_by(name=request.form["showname"]).first()
+            show_selected = Show.query.filter_by(name=request.form["showname"]).first()
+            venue_selected = Venue.query.filter_by(name=request.form["venuename"]).first()
+            old_ticket = Ticket.query.filter_by(showname=show_selected.name, venuename=venue_selected.name).all()
+            if old_ticket==[]:
+                new_ticket= Ticket(showname=show_selected.name,venuename=venue_selected.name, ticketqty=request.form["ticketqty"],customerid=session["user_id"], ticketprice = show_selected.ticketPrice )
+                db.session.add(new_ticket)
+                db.session.commit()
+                return redirect(url_for("userDashboard"))
+            else:
+                flash("ticket already purchased","danger")
+                return redirect(url_for("userDashboard"))
+                # return render_template("/user/dashboard.html")
+            # elif request.method=='GET':
+            #     return redirect("/user/ticket.html")
         return redirect(url_for("userDashboard"))
     else:
             return redirect("/")
@@ -518,5 +567,57 @@ def listTickets():
     pass
 
 ############################# api for ticket booking end ########################################
+
+def get_dropdown_values():
+    carbrands = Venue.query.all()
+    # Create an empty dictionary
+    myDict = {}
+    for p in carbrands:
+    
+        key = p.name
+        brand_id = p.id
+
+        # Select all car models that belong to a car brand
+        q = Show.query.filter_by(venue_id=brand_id).all()
+    
+        # build the structure (lst_c) that includes the names of the car models that belong to the car brand
+        lst_c = []
+        for c in q:
+            lst_c.append( c.name )
+        myDict[key] = lst_c
+    
+    
+    class_entry_relations = myDict
+                        
+    return class_entry_relations
+
+
+@app.route('/_update_dropdown')
+def update_dropdown():
+
+    # the value of the first dropdown (selected by the user)
+    selected_class = request.args.get('selected_class', type=str)
+
+    # get values for the second dropdown
+    updated_values = get_dropdown_values()[selected_class]
+
+    # create the value sin the dropdown as a html string
+    html_string_selected = ''
+    for entry in updated_values:
+        html_string_selected += '<option value="{}">{}</option>'.format(entry, entry)
+
+    return jsonify(html_string_selected=html_string_selected)
+
+
+@app.route('/_process_data')
+def process_data():
+    selected_class = request.args.get('selected_class', type=str)
+    selected_entry = request.args.get('selected_entry', type=str)
+
+    # process the two selected values here and return the response; here we just create a dummy string
+
+    return jsonify(random_text="You selected the car brand: {} and the model: {}.".format(selected_class, selected_entry))
+
+
 if __name__ == "__main__":
     app.run(debug=True)
