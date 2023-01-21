@@ -15,6 +15,7 @@ class AdminLoginForm(FlaskForm):
 #addign another contibution
 # amking anothe commit
 #making another comiit
+# addding antohr stupeid commit
 class RegisterForm(FlaskForm):
     username = StringField(validators=[
                            InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username","class":"form-control my-1 "})
